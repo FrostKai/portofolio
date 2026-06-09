@@ -6,11 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Portfolio | Creative Developer</title>
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS (pinned version + SRI) -->
+    <script src="https://cdn.tailwindcss.com/3.4.17"
+            integrity="sha384-igm5BeiBt36UU4gqwWS7imYmelpTsZlQ45FZf+XBn9MuJbn4nQr7yx1yFydocC/K"
+            crossorigin="anonymous"></script>
 
-    <!-- Feather Icons -->
-    <script src="https://unpkg.com/feather-icons"></script>
+    <!-- Feather Icons (pinned version + SRI) -->
+    <script src="https://unpkg.com/feather-icons@4.29.2/dist/feather.min.js"
+            integrity="sha384-qEqAs1VsN9WH2myXDbiP2wGGIttL9bMRZBKCl54ZnzpDlVqbYANP9vMaoT/wvQcf"
+            crossorigin="anonymous"></script>
 
     <!-- Custom Styles -->
     <link rel="stylesheet" href="style.css" />
@@ -488,7 +492,7 @@
                     <p class="text-gray-500 text-sm">your.email@example.com</p>
                 </a>
 
-                <a href="https://linkedin.com" target="_blank" class="group p-8 rounded-2xl border border-gray-800 hover:border-cyan-600 transition-all duration-500 hover:shadow-[0_0_30px_rgba(0,255,255,0.1)] hover:bg-gray-950">
+                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="group p-8 rounded-2xl border border-gray-800 hover:border-cyan-600 transition-all duration-500 hover:shadow-[0_0_30px_rgba(0,255,255,0.1)] hover:bg-gray-950">
                     <div class="w-12 h-12 mx-auto mb-4 rounded-full bg-gray-900 flex items-center justify-center group-hover:bg-cyan-900/30 transition-colors duration-300">
                         <i data-feather="linkedin" class="w-6 h-6"></i>
                     </div>
@@ -496,7 +500,7 @@
                     <p class="text-gray-500 text-sm">Your LinkedIn Profile</p>
                 </a>
 
-                <a href="https://github.com" target="_blank" class="group p-8 rounded-2xl border border-gray-800 hover:border-cyan-600 transition-all duration-500 hover:shadow-[0_0_30px_rgba(0,255,255,0.1)] hover:bg-gray-950">
+                <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="group p-8 rounded-2xl border border-gray-800 hover:border-cyan-600 transition-all duration-500 hover:shadow-[0_0_30px_rgba(0,255,255,0.1)] hover:bg-gray-950">
                     <div class="w-12 h-12 mx-auto mb-4 rounded-full bg-gray-900 flex items-center justify-center group-hover:bg-cyan-900/30 transition-colors duration-300">
                         <i data-feather="github" class="w-6 h-6"></i>
                     </div>
@@ -662,7 +666,9 @@
     </div>
 
     <!-- ── SCRIPTS ─────────────────────────────── -->
-    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://unpkg.com/feather-icons@4.29.2/dist/feather.min.js"
+            integrity="sha384-qEqAs1VsN9WH2myXDbiP2wGGIttL9bMRZBKCl54ZnzpDlVqbYANP9vMaoT/wvQcf"
+            crossorigin="anonymous"></script>
     <script>feather.replace();</script>
     <script src="snake.game.js"></script>
     <script src="main.js"></script>

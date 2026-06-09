@@ -304,9 +304,23 @@
         if (overlay) overlay.classList.add('hidden');
     }
 
-    function showOverlay(title, sub, btnText) {
+    function setOverlayTitle(parts) {
+        if (!overlayTitle) return;
+        overlayTitle.textContent = '';
+        parts.forEach(part => {
+            if (part.accent) {
+                const span = document.createElement('span');
+                span.textContent = part.text;
+                overlayTitle.appendChild(span);
+            } else {
+                overlayTitle.appendChild(document.createTextNode(part.text));
+            }
+        });
+    }
+
+    function showOverlay(titleParts, sub, btnText) {
         if (!overlay) return;
-        if (overlayTitle) overlayTitle.innerHTML = title;
+        setOverlayTitle(titleParts);
         if (overlaySub)  overlaySub.textContent  = sub;
         if (startBtn)    startBtn.textContent     = btnText;
         overlay.classList.remove('hidden');
@@ -315,7 +329,7 @@
     function showGameOver() {
         draw(); // Final frame
         showOverlay(
-            `GAME <span>OVER</span>`,
+            [{ text: 'GAME ' }, { text: 'OVER', accent: true }],
             `SCORE: ${String(score).padStart(4,'0')} // HI: ${String(highScore||0).padStart(4,'0')}`,
             'RESTART'
         );
@@ -381,7 +395,7 @@
     function pauseGame() {
         gameState = 'paused';
         clearInterval(gameLoop);
-        showOverlay('SYSTEM <span>PAUSED</span>', 'PRESS P TO RESUME', 'RESUME');
+        showOverlay([{ text: 'SYSTEM ' }, { text: 'PAUSED', accent: true }], 'PRESS P TO RESUME', 'RESUME');
     }
 
     function resumeGame() {
@@ -435,7 +449,7 @@
 
     drawIdleScreen();
     showOverlay(
-        '<span>SNAKE</span>.EXE',
+        [{ text: 'SNAKE', accent: true }, { text: '.EXE' }],
         'USE ARROW KEYS OR WASD // SWIPE ON MOBILE',
         'INITIALIZE'
     );
