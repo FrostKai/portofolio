@@ -13,6 +13,28 @@
     const BASE_SPEED = 140;  // ms per tick
     const SPEED_INC  = 4;    // ms faster per food eaten
 
+    // Convert a CSS color string to rgba with given alpha
+    function toRGBA(color, alpha) {
+        // Handle hex colors (#rgb or #rrggbb)
+        if (color.startsWith('#')) {
+            let hex = color.slice(1);
+            if (hex.length === 3) {
+                hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+            }
+            const r = parseInt(hex.slice(0, 2), 16);
+            const g = parseInt(hex.slice(2, 4), 16);
+            const b = parseInt(hex.slice(4, 6), 16);
+            return `rgba(${r},${g},${b},${alpha})`;
+        }
+        // Handle rgb(...) strings
+        const match = color.match(/^rgb\(\s*(\d+),\s*(\d+),\s*(\d+)\s*\)$/);
+        if (match) {
+            return `rgba(${match[1]},${match[2]},${match[3]},${alpha})`;
+        }
+        // Fallback: return color as-is
+        return color;
+    }
+
     // Dynamic Colors based on theme
     function getColors() {
         const style = getComputedStyle(document.body);
@@ -38,7 +60,9 @@
 
     // ── DOM ──────────────────────────────────────
     const canvas      = document.getElementById('snake-canvas');
+    if (!canvas) return; // Guard if elements not found
     const ctx         = canvas.getContext('2d');
+    if (!ctx) return; // Guard if 2d context unavailable
     const overlay     = document.getElementById('snake-overlay');
     const overlayTitle = document.getElementById('snake-overlay-title');
     const overlaySub  = document.getElementById('snake-overlay-sub');
@@ -46,8 +70,6 @@
     const scoreEl     = document.getElementById('snake-score');
     const hiEl        = document.getElementById('snake-hi');
     const livesEl     = document.getElementById('snake-lives');
-
-    if (!canvas) return; // Guard if elements not found
 
     canvas.width  = CANVAS_PX;
     canvas.height = CANVAS_PX;
@@ -71,6 +93,8 @@
 
     // ── FOOD ─────────────────────────────────────
     function spawnFood() {
+        const maxCells = GRID * GRID;
+        let attempts = 0;
         let pos;
         do {
             pos = {
@@ -78,6 +102,19 @@
                 y: Math.floor(Math.random() * GRID),
                 pulse: 0
             };
+            attempts++;
+            if (attempts > maxCells) {
+                // Grid is full; place food at first available cell
+                for (let y = 0; y < GRID; y++) {
+                    for (let x = 0; x < GRID; x++) {
+                        if (!snake.some(s => s.x === x && s.y === y)) {
+                            return { x, y, pulse: 0 };
+                        }
+                    }
+                }
+                // Truly no space left — return off-grid sentinel
+                return { x: -1, y: -1, pulse: 0 };
+            }
         } while (snake.some(s => s.x === pos.x && s.y === pos.y));
         return pos;
     }
@@ -226,11 +263,7 @@
                 ctx.shadowBlur = 0;
                 // Gradient from body to tail
                 const alpha = 0.3 + 0.7 * t;
-                ctx.fillStyle = colors.snakeBody.replace(')', `,${alpha})`).replace('rgb', 'rgba');
-                // Simple fallback if regex fails
-                if (!ctx.fillStyle.includes('rgba')) {
-                    ctx.fillStyle = colors.snakeHead + '88';
-                }
+                ctx.fillStyle = toRGBA(colors.snakeBody, alpha);
             }
 
             const pad = isHead ? 1 : 2;
@@ -415,7 +448,7 @@
         ];
         demoSnake.forEach((seg, i) => {
             const t = 1 - i / demoSnake.length;
-            ctx.fillStyle = i === 0 ? colors.snakeHead : colors.snakeBody.replace(')', `,${0.2 + 0.6*t})`).replace('rgb', 'rgba');
+            ctx.fillStyle = i === 0 ? colors.snakeHead : toRGBA(colors.snakeBody, 0.2 + 0.6 * t);
             ctx.shadowBlur  = i === 0 ? 10 : 0;
             ctx.shadowColor = colors.snakeGlow;
             roundRect(ctx, seg.x*CELL+1, seg.y*CELL+1, CELL-2, CELL-2, i===0?4:3);

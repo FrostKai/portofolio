@@ -32,7 +32,9 @@
 
     // ── DOM ──────────────────────────────────────
     const canvas      = document.getElementById('snake-canvas');
+    if (!canvas) return; // Guard if elements not found
     const ctx         = canvas.getContext('2d');
+    if (!ctx) return; // Guard if 2d context unavailable
     const overlay     = document.getElementById('snake-overlay');
     const overlayTitle = document.getElementById('snake-overlay-title');
     const overlaySub  = document.getElementById('snake-overlay-sub');
@@ -40,8 +42,6 @@
     const scoreEl     = document.getElementById('snake-score');
     const hiEl        = document.getElementById('snake-hi');
     const livesEl     = document.getElementById('snake-lives');
-
-    if (!canvas) return; // Guard if elements not found
 
     canvas.width  = CANVAS_PX;
     canvas.height = CANVAS_PX;
@@ -65,6 +65,8 @@
 
     // ── FOOD ─────────────────────────────────────
     function spawnFood() {
+        const maxCells = GRID * GRID;
+        let attempts = 0;
         let pos;
         do {
             pos = {
@@ -72,6 +74,19 @@
                 y: Math.floor(Math.random() * GRID),
                 pulse: 0
             };
+            attempts++;
+            if (attempts > maxCells) {
+                // Grid is full; place food at first available cell
+                for (let y = 0; y < GRID; y++) {
+                    for (let x = 0; x < GRID; x++) {
+                        if (!snake.some(s => s.x === x && s.y === y)) {
+                            return { x, y, pulse: 0 };
+                        }
+                    }
+                }
+                // Truly no space left — return off-grid sentinel
+                return { x: -1, y: -1, pulse: 0 };
+            }
         } while (snake.some(s => s.x === pos.x && s.y === pos.y));
         return pos;
     }

@@ -36,16 +36,23 @@
     const body = document.body;
 
     const updateThemeIcons = (isLight) => {
-        if (isLight) {
-            themeIconDark.classList.add('hidden');
-            themeIconLight.classList.remove('hidden');
-        } else {
-            themeIconDark.classList.remove('hidden');
-            themeIconLight.classList.add('hidden');
+        if (themeIconDark && themeIconLight) {
+            if (isLight) {
+                themeIconDark.classList.add('hidden');
+                themeIconLight.classList.remove('hidden');
+            } else {
+                themeIconDark.classList.remove('hidden');
+                themeIconLight.classList.add('hidden');
+            }
         }
     };
 
-    const savedTheme = localStorage.getItem('theme') || 'dark';
+    let savedTheme = 'dark';
+    try {
+        savedTheme = localStorage.getItem('theme') || 'dark';
+    } catch (e) {
+        // Storage may be unavailable in private browsing
+    }
     body.setAttribute('data-theme', savedTheme);
     updateThemeIcons(savedTheme === 'light');
 
@@ -54,7 +61,11 @@
             const currentTheme = body.getAttribute('data-theme');
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
             body.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
+            try {
+                localStorage.setItem('theme', newTheme);
+            } catch (e) {
+                // Storage may be unavailable in private browsing
+            }
             updateThemeIcons(newTheme === 'light');
             
             // Dispatch event for other scripts (like snake game)
@@ -117,7 +128,7 @@
     const mobileMenuBtn = document.getElementById('mobile-menu-btn');
     const mobileNav = document.getElementById('mobile-nav');
 
-    if (mobileMenuBtn) {
+    if (mobileMenuBtn && mobileNav) {
         mobileMenuBtn.addEventListener('click', () => {
             mobileNav.classList.toggle('open');
             mobileMenuBtn.setAttribute('aria-expanded', 
@@ -136,24 +147,31 @@
     }
 
     // Scroll animations - Intersection Observer
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
+    if (typeof IntersectionObserver !== 'undefined') {
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
 
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-            }
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all fade-in sections and project cards
+        const fadeSections = document.querySelectorAll('.fade-in-section, .project-card');
+        fadeSections.forEach(section => {
+            observer.observe(section);
         });
-    }, observerOptions);
-
-    // Observe all fade-in sections and project cards
-    const fadeSections = document.querySelectorAll('.fade-in-section, .project-card');
-    fadeSections.forEach(section => {
-        observer.observe(section);
-    });
+    } else {
+        // Fallback: make all sections visible immediately
+        document.querySelectorAll('.fade-in-section, .project-card').forEach(section => {
+            section.classList.add('visible');
+        });
+    }
 
     // Smooth scroll enhancement
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -187,7 +205,7 @@
             const scrollProgress = document.getElementById('scroll-progress');
             if (scrollProgress) {
                 const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
-                const percentage = (scrolled / totalScroll) * 100;
+                const percentage = totalScroll > 0 ? (scrolled / totalScroll) * 100 : 0;
                 scrollProgress.style.width = `${percentage}%`;
             }
             // Parallax for Floating Shapes
@@ -264,6 +282,10 @@
 
     // Initialize Feather Icons
     if (typeof feather !== 'undefined') {
-        feather.replace();
+        try {
+            feather.replace();
+        } catch (e) {
+            // Feather icons may fail if DOM elements are malformed
+        }
     }
 })();
